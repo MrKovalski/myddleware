@@ -85,6 +85,7 @@ class vtigercrmcore extends solution
 								
 
 
+
 	// Module list that allows to make parent relationships
 	protected $allowParentRelationship = array('Quotes');
 
@@ -608,6 +609,7 @@ class vtigercrmcore extends solution
 						$data['productid'] = $childRecord['productid'];
 						unset($data['LineItem']);
 					}	
+
 					if (!empty($lineItemFields) && in_array($param['module'], $this->inventoryModules, true)) {
 						foreach ($data as $inventorykey => $inventoryValue) {
 							if (in_array($inventorykey, $lineItemFields, true) && $inventorykey != "id") {
@@ -771,7 +773,6 @@ class vtigercrmcore extends solution
 	
 	// Clean a record by removing all Myddleware fields
 	protected function cleanRecord($param, $data) {
-
 		$myddlewareFields = array('target_id', 'source_date_modified', 'id_doc_myddleware','Myddleware_element_id');
 		foreach ($myddlewareFields as $myddlewareField) {
 			if (array_key_exists($myddlewareField, $data)) {
