@@ -167,7 +167,6 @@
             "support": {
                 "issues": "https://github.com/api-platform/core/issues",
         },
-        {
             "name": "automattic/woocommerce",
             "version": "3.0.0",
             "source": {
