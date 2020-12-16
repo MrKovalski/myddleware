@@ -744,3 +744,15 @@ management_smtp:
 management_smtp_sendmail:
     subject: Myddleware - email configuration test
     textMail: This test message has been sent by Myddleware.
+
+install:
+    title: Myddleware Installation
+    requirements_checker: Myddleware Requirements Checker
+    check_button: Check now 
+    requirements_info: First, let's check whether your server meets the requirements to run a Myddleware project.
+    php_ini_error: WARNING ! No configuration file (php.ini) used by PHP!
+    php_ini_path_sentence:  PHP is using the following php.ini file
+    php_version_not_found: WARNING ! Could not find your PHP version
+    errors_to_do_message: You need to do the following before continuing
+    recommendations_to_do_message: Optional recommendations to improve your setup
+    note_message: The command console could use a different php.ini file than the one used with your web server. To be on the safe side, please check the requirements from your web server using the command from your Myddleware directory 

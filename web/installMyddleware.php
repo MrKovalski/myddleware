@@ -24,7 +24,7 @@
 <link type="text/css" href="<?php echo $urlBase; ?>/web/css/compiled/main_layout_2.css" rel="stylesheet">
 *********************************************************************************/
 ?>
-<?php $urlBase = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://').$_SERVER['SERVER_NAME'].$_SERVER['BASE']; ?>
+<?php $urlBase = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://').$_SERVER['SERVER_NAME'].$_SERVER['BASE'];?>
 
 <html class="" lang="us">
 <head>
@@ -67,11 +67,11 @@ table, th, td {
 <div id="logo"></div>
 <div id="myd_title">Myddleware installation</div>
 <section>
-<div id="user_account">
-<div id="user_info">
-<table>
-<tr>
-<td>
+	<div id="user_account">
+		<div id="user_info">
+			<table>
+				<tr>
+					<td>
 <?php
 ini_set('display_errors', 1); 
 error_reporting(E_ALL); 
@@ -100,7 +100,6 @@ $symfonyRequirements->addRequirement( version_compare(phpversion(), '7.2', '>=')
 $symfonyRequirements->addRequirement( version_compare(phpversion(), '7.4', '<'), 'Wrong php version', 'Your php version is '.phpversion().' and Myddleware is compatible php version < 7.4');
 
 $iniPath = $symfonyRequirements->getPhpIniConfigPath();
-
 echo_title('Myddleware Requirements Checker');
 
 echo '> PHP is using the following php.ini file:'.'<BR>';
@@ -116,7 +115,7 @@ echo '> Checking Myddleware requirements:'.'<BR>'.'  ';
 
 $messages = array();
 foreach ($symfonyRequirements->getRequirements() as $req) {
-    /** @var $req Requirement */
+	/** @var $req Requirement */
     if ($helpText = get_error_message($req, $lineSize)) {
         echo_style('red', 'E');
         $messages['error'][] = $helpText;
@@ -126,7 +125,6 @@ foreach ($symfonyRequirements->getRequirements() as $req) {
 }
 
 $checkPassed = empty($messages['error']);
-
 foreach ($symfonyRequirements->getRecommendations() as $req) {
     if ($helpText = get_error_message($req, $lineSize)) {
         echo_style('orange', 'W');
@@ -230,6 +228,7 @@ else {
 
 	// Get current Myddleware parameters
 	$myddlewareParameters = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($kernel->getRootDir() .'/config/parameters.yml'));
+	var_dump($myddlewareParameters);
 	$myddlewareParametersPublic = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($kernel->getRootDir() .'/config/public/parameters_public.yml'));
 	$databaseConnection = 0;
 	$userCreated = 0;

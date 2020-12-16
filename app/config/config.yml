@@ -5,6 +5,7 @@ imports:
     - { resource: public/parameters_custom.yml }
     - { resource: security.yml }
     - { resource: parameters_platform.php }
+    - { resource: "@MyddlewareInstallBundle/Resources/config/services.yml" }
 
 framework:
     #esi:             ~
