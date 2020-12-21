@@ -230,6 +230,8 @@ else {
 	$myddlewareParameters = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($kernel->getRootDir() .'/config/parameters.yml'));
 	var_dump($myddlewareParameters);
 	$myddlewareParametersPublic = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($kernel->getRootDir() .'/config/public/parameters_public.yml'));
+	var_dump($myddlewareParametersPublic);
+	
 	$databaseConnection = 0;
 	$userCreated = 0;
 
@@ -238,7 +240,15 @@ else {
 		$myddlewareParameters['parameters']['secret']= md5(rand(0,10000).date('YmdHis').'myddlewa');		
 		$new_yaml = \Symfony\Component\Yaml\Yaml::dump($myddlewareParameters, 4);
 		file_put_contents($kernel->getRootDir() .'/config/parameters.yml', $new_yaml);
+		var_dump($new_yaml);
 	}	
+
+	if ($myddlewareParameters['parameters']['secret'] == 'Theseviolentdelightshaveviolentends') {
+		$myddlewareParameters['parameters']['secret']= md5(rand(0,10000).date('YmdHis').'myddleware');
+		$new_yaml = \Symfony\Component\Yaml\Yaml::dump($myddlewareParameters, 4);
+		var_dump($myddlewareParameters['parameters']['secret']);
+		var_dump($new_yaml);
+	}
 	
 	// Before we open the form for the installation we check the access to the database 
 	if (

@@ -22,30 +22,6 @@
  You should have received a copy of the GNU General Public License
  along with Myddleware.  If not, see <http://www.gnu.org/licenses/>.
 *********************************************************************************/
-use Automattic\WooCommerce\Client; 
-
-
-// $woocommerce = new Client(
-//     'http://localhost/myddleware/wordpress', 
-//     'ck_4d08598e65e7ad6a188fecaeb26d06ecdbdd30b4', 
-//     'cs_82858696bfa94993dc4e27cdf59d5cf2432f87c1',
-//     [
-//         'version' => 'wc/v3',
-//     ]
-// );
-
-
-// foreach($woocommerce->get('payment_gateways') as $key => $value){
-//     foreach($value as $clef => $ligne){
-//         echo '<br/>';
-//         print_r("'".$clef."' => array( 'label' => '".ucfirst($clef)."', 
-//         'type' => 'varchar(255)', 'type_bdd' => 'varchar(255)', 'required' => 0),");
-//     }
-   
-// }
-
-
-// print_r($woocommerce->get('products'));
 
 $moduleFields = array (
                         'products' => array(
@@ -107,7 +83,7 @@ $moduleFields = array (
                             'cross_sell_ids' => array( 'label' => 'Cross_sell_ids', 'type' => 'varchar(255)', 'type_bdd' => 'varchar(255)', 'required' => 0),
                             'parent_id' => array( 'label' => 'Parent_id', 'type' => 'varchar(255)', 'type_bdd' => 'varchar(255)', 'required' => 0),
                             'purchase_note' => array( 'label' => 'Purchase_note', 'type' => 'varchar(255)', 'type_bdd' => 'varchar(255)', 'required' => 0),
-                            // 'categories' => array( 'label' => 'Categories', 'type' => 'varchar(255)', 'type_bdd' => 'varchar(255)', 'required' => 0),
+                            'categories' => array( 'label' => 'Categories', 'type' => 'varchar(255)', 'type_bdd' => 'varchar(255)', 'required' => 0),
                             // 'categories__id' => array( 'label' => 'Categories ID', 'type' => 'varchar(255)', 'type_bdd' => 'varchar(255)', 'required' => 0),
                             // 'categories__name' => array( 'label' => 'Categories Name', 'type' => 'varchar(255)', 'type_bdd' => 'varchar(255)', 'required' => 0),
                             // 'categories__slug' => array( 'label' => 'Categories Slug', 'type' => 'varchar(255)', 'type_bdd' => 'varchar(255)', 'required' => 0),

@@ -747,8 +747,10 @@ management_smtp_sendmail:
 
 install:
     title: Myddleware Installation
+    database_setup : Setting up your database
     requirements_checker: Myddleware Requirements Checker
     check_button: Check now 
+    next: Next
     requirements_info: First, let's check whether your server meets the requirements to run a Myddleware project.
     php_ini_error: WARNING ! No configuration file (php.ini) used by PHP!
     php_ini_path_sentence:  PHP is using the following php.ini file

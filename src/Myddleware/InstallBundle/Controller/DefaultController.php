@@ -2,11 +2,18 @@
 
 namespace Myddleware\InstallBundle\Controller;
 
-use phpDocumentor\Reflection\Types\Boolean;
 use Requirement;
 use SymfonyRequirements;
+use Symfony\Component\Yaml\Yaml;
+use phpDocumentor\Reflection\Types\Boolean;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\HttpFoundation\Request;
+use Myddleware\InstallBundle\Form\DatabaseSetupType;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Myddleware\InstallBundle\Entity\DatabaseParameters;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 class DefaultController extends Controller
 {
@@ -48,7 +55,6 @@ class DefaultController extends Controller
         $this->iniPath = $this->symfonyRequirements->getPhpIniConfigPath();
         $this->phpVersion = phpversion();
         $this->urlBase = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://').$_SERVER['SERVER_NAME'].$_SERVER['BASE'];
-        $this->mydVersion = 'test';
        
         $errorMesssages = array();
         foreach($this->symfonyRequirements->getRequirements() as $req){
@@ -80,5 +86,80 @@ class DefaultController extends Controller
                                 'system_status' => $this->systemStatus,
                                 'recommendation_messages' => $recommendationMesssages
                             ));
+    }
+
+    /**
+     * @Route("/database/setup")
+     */
+    public function setupDatabaseAction(Request $request){
+
+        //this will allow us to get the DatabaseParameters object & turn it into an array to push in config/parameters.yml
+        $encoder = new JsonEncoder();
+        $normalizer = new GetSetMethodNormalizer();
+        $serializer = new Serializer([$normalizer], [$encoder]);
+    
+
+        //get all parameters from config/parameters.yml and push them in a new instance of DatabaseParameters()
+        $database = new DatabaseParameters();
+        $database->setDatabaseDriver($this->getParameter('database_driver'));
+        $database->setDatabaseHost($this->getParameter('database_host'));
+        $database->setDatabasePort($this->getParameter('database_port'));
+        $database->setDatabaseName($this->getParameter('database_name'));
+        $database->setDatabaseUser($this->getParameter('database_user'));
+        $database->setSecret($this->getParameter('secret'));
+        $database->setMyddlewareSupport($this->getParameter('myddleware_support'));
+        $database->setParam($this->getParameter('param'));
+        $database->setExtensionAllowed($this->getParameter('extension_allowed'));
+        $database->setMydVersion($this->getParameter('myd_version'));
+        $database->setBlockInstall($this->getParameter('block_install'));
+
+        // force user to change the secret
+        if($database->getSecret() === 'ThisTokenIsNotSoSecretChangeIt') {
+            $database->setSecret(md5(rand(0,10000).date('YmdHis').'myddleware'));
+            
+
+        }  elseif($database->getSecret() === '') {
+            $database->setSecret(md5(rand(0,10000).date('YmdHis').'myddleware'));
+
+        
+        $databaseTest = $serializer->normalize($database, null);
+        // foreach($databaseTest as $databaseFieldName => $databaseFieldValue){
+        //     if(strpbrk($databaseFieldName, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')){
+        //         $explode = explode($array, $databaseFieldName);
+        //         var_dump($array);
+        //         var_dump($explode);
+        //     }
+         
+     
+
+            var_dump($databaseTest);
+            // $yaml = Yaml::dump($databaseArray);
+            // var_dump($yaml);
+            // file_put_contents('/path/to/file.yml', $yaml);
+
+            var_dump($this->getParameter('secret'));
+        } else {
+      
+        }
+
+
+
+        $form = $this->createForm(DatabaseSetupType::class, $database);
+        
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $database = $form->getData();
+            // return $this->redirectToRoute('MyddlewareInstallBundle:Default:database_setup.html.twig');
+        }
+
+
+
+
+        return $this->render('MyddlewareInstallBundle:Default:database_setup.html.twig', 
+                                array(
+                                'form' => $form->createView() 
+                                 )
+                                );
     }
 }

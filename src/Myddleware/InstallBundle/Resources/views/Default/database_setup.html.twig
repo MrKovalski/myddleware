@@ -1,0 +1,34 @@
+{% extends '::baseone.html.twig' %}
+{% block title %} {{ 'install.title' | trans }} {% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{{ asset('bundles/install/css/install.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ asset('bundles/regle/css/layout.css') }}" type="text/css" />
+{% endblock css %}
+{% block body %}
+<div id="myd_top"></div>
+<div id="logo"></div>
+<div class="container">
+    <section>
+        <div id="myd_title">
+            <p>{{ 'install.title' | trans }}</p>
+        </div>
+        <article class="panel panel-success">
+            <div class="panel-heading">
+                <h1 class="panel-title">{{ 'install.database_setup' | trans }}</h1>
+                   
+            </div>
+            <div class="panel-body">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
+            </div> 
+           <button class="btn btn-success btn-lg" onClick="window.location.reload()">{{ 'install.next' | trans }}</button>
+        </article>
+           
+    </section>
+</div>
+    <footer>
+        <p>© Myddleware 2014 - {{ 'now' | date('Y') }}</p>
+        <p>version {{ myd_version }}</p>
+    </footer>
+{% endblock %}

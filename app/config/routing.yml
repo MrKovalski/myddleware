@@ -3,6 +3,11 @@ myddleware_install:
     type:     annotation
     prefix:   /install
 
+# myddleware_install_database_setup:
+#     resource: "@MyddlewareInstallBundle/Controller/"
+#     type:     annotation
+#     prefix:   /database/setup
+
 myddleware_api:
     resource: "@MyddlewareApiBundle/Resources/config/routing.yml"
     prefix:   /api

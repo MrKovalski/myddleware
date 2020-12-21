@@ -56,7 +56,11 @@
                         </div>
                     </div>
                 </aside>
-                <button class="btn btn-success btn-lg" onClick="window.location.reload()">{{ 'install.check_button' | trans }}</button>
+                <div class="buttons">
+                    <button class="btn btn-success btn-lg" onClick="window.location.reload()">{{ 'install.check_button' | trans }}</button>
+                    {# <button class="btn btn-success btn-lg" onClick="{{ path('myddleware_install_database_setup') }}">{{ 'install.next' | trans }}</button> #}
+                    <button class="btn btn-success btn-lg">{{ 'install.next' | trans }}</button>
+                </div>
             </div> 
           
         </article>

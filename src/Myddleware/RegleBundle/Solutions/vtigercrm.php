@@ -474,7 +474,6 @@ class vtigercrmcore extends solution
 				'count' => 0,
 			];
 
-
 			$orderby = "ORDER BY modifiedtime ASC";;
 			if (in_array($param["module"], $this->inventoryModules, true)) {
 				$orderby = "";
@@ -487,8 +486,7 @@ class vtigercrmcore extends solution
 				if ($param["module"] == "LineItem") {
 					if (empty($this->moduleList)) {
 						$this->setModulePrefix();
-					}
-					
+					}				
 					$query = $this->vtigerClient->query("SELECT parent_id FROM $param[module];");
 
 					$parentModules = [];
@@ -558,7 +556,7 @@ class vtigercrmcore extends solution
 			} while ($dataLeft > 0 && $countResult >= $nDataCall);
 		} catch (\Exception $e) {
 			$result['error'] = 'Error : ' . $e->getMessage().' '.$e->getFile().' '.$e->getLine();
-		}	
+		}
         return $result;
     }
 
