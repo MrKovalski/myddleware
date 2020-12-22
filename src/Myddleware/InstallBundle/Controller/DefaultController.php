@@ -2,18 +2,34 @@
 
 namespace Myddleware\InstallBundle\Controller;
 
+use AppKernel;
+use Exception;
 use Requirement;
 use SymfonyRequirements;
+// use Doctrine\ORM\ORMException;
+// use Doctrine\DBAL\DBALException;
 use Symfony\Component\Yaml\Yaml;
+// use Doctrine\DBAL\Driver\PDOException;
+use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Myddleware\InstallBundle\Form\DatabaseSetupType;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Console\Output\BufferedOutput;
+
+use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Myddleware\InstallBundle\Entity\DatabaseParameters;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+
+
 
 class DefaultController extends Controller
 {
@@ -24,6 +40,7 @@ class DefaultController extends Controller
     private $mydVersion;
     private $checkPassed;
     private $systemStatus;
+    private $connectionSuccessMessage;
 
     /**
      * @Route("/")
@@ -93,72 +110,132 @@ class DefaultController extends Controller
      */
     public function setupDatabaseAction(Request $request){
 
-        //this will allow us to get the DatabaseParameters object & turn it into an array to push in config/parameters.yml
-        $encoder = new JsonEncoder();
-        $normalizer = new GetSetMethodNormalizer();
-        $serializer = new Serializer([$normalizer], [$encoder]);
+        try {
+           
     
+            //this will allow us to get the DatabaseParameters object & turn it into an array to push in config/parameters.yml
+            $encoder = new YamlEncoder();
+            $normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
+            $serializer = new Serializer([$normalizer], [$encoder]);
 
-        //get all parameters from config/parameters.yml and push them in a new instance of DatabaseParameters()
-        $database = new DatabaseParameters();
-        $database->setDatabaseDriver($this->getParameter('database_driver'));
-        $database->setDatabaseHost($this->getParameter('database_host'));
-        $database->setDatabasePort($this->getParameter('database_port'));
-        $database->setDatabaseName($this->getParameter('database_name'));
-        $database->setDatabaseUser($this->getParameter('database_user'));
-        $database->setSecret($this->getParameter('secret'));
-        $database->setMyddlewareSupport($this->getParameter('myddleware_support'));
-        $database->setParam($this->getParameter('param'));
-        $database->setExtensionAllowed($this->getParameter('extension_allowed'));
-        $database->setMydVersion($this->getParameter('myd_version'));
-        $database->setBlockInstall($this->getParameter('block_install'));
+            //used to access root dir
+            $kernel = new AppKernel('prod', true);
+        
 
-        // force user to change the secret
-        if($database->getSecret() === 'ThisTokenIsNotSoSecretChangeIt') {
-            $database->setSecret(md5(rand(0,10000).date('YmdHis').'myddleware'));
+            //get all parameters from config/parameters.yml and push them in a new instance of DatabaseParameters()
+            $database = new DatabaseParameters();
+            $database->setDatabaseDriver($this->getParameter('database_driver'));
+            $database->setDatabaseHost($this->getParameter('database_host'));
+            $database->setDatabasePort($this->getParameter('database_port'));
+            $database->setDatabaseName($this->getParameter('database_name'));
+            $database->setDatabaseUser($this->getParameter('database_user'));
+            $database->setSecret($this->getParameter('secret'));
+            $database->setMyddlewareSupport($this->getParameter('myddleware_support'));
+            $database->setParam($this->getParameter('param'));
+            $database->setExtensionAllowed($this->getParameter('extension_allowed'));
+            $database->setMydVersion($this->getParameter('myd_version'));
+            $database->setBlockInstall($this->getParameter('block_install'));
+
+
+            // force user to change the default Symfony secret for security
+            if($database->getSecret() === 'ThisTokenIsNotSoSecretChangeIt') {
+                $database->setSecret(md5(rand(0,10000).date('YmdHis').'myddleware'));
+                $databaseNormalized['parameters'] = $serializer->normalize($database, null);
+                //convert the normalized object into a yml file
+                $yaml = Yaml::dump($databaseNormalized, 4);
+                //push yml content into parameters.yml
+                file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);
+            }
+
+            $form = $this->createForm(DatabaseSetupType::class, $database);
+            $form->handleRequest($request);
             
+            //send form data input to parameters.yml
+            if ($form->isSubmitted() && $form->isValid()) {
+                $database = $form->getData();
+                $databaseNormalized['parameters'] = $serializer->normalize($database, null);
+                //convert the normalized object into a yml file
+                $yaml = Yaml::dump($databaseNormalized, 4);
+                //push yml content into parameters.yml
+                file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);
+                // return $this->redirectToRoute('MyddlewareInstallBundle:Default:database_setup.html.twig');
+          
 
-        }  elseif($database->getSecret() === '') {
-            $database->setSecret(md5(rand(0,10000).date('YmdHis').'myddleware'));
+                 $this->connectionSuccessMessage = "Click on the Test button to check your database credentials";
+              
+                $em = $this->getDoctrine()->getManager();
+                $em->getConnection()->connect();
+                $connected = $em->getConnection()->isConnected();
+  
+                // if($connected === false){
+                //     $this->connectionSuccessMessage = 'There was an error while trying to your database, please check your parameters and try again.';
 
+                // } else {
+                //     $this->connectionSuccessMessage = 'Connection to the database successful';
+                // }
+             
+
+                // try {
+
+                    // we execute Doctrine console commands to test the connection to the database
+                    $application = new Application($kernel);
+                    $application->setAutoExit(false);
         
-        $databaseTest = $serializer->normalize($database, null);
-        // foreach($databaseTest as $databaseFieldName => $databaseFieldValue){
-        //     if(strpbrk($databaseFieldName, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')){
-        //         $explode = explode($array, $databaseFieldName);
-        //         var_dump($array);
-        //         var_dump($explode);
-        //     }
-         
-     
+                    $input = new ArrayInput(array(
+                        'command' => 'doctrine:schema:update'
+                        // '--filename' => "test",
+                        // '--extension' => "txt"
+                    ));
 
-            var_dump($databaseTest);
-            // $yaml = Yaml::dump($databaseArray);
-            // var_dump($yaml);
-            // file_put_contents('/path/to/file.yml', $yaml);
-
-            var_dump($this->getParameter('secret'));
-        } else {
-      
-        }
-
-
-
-        $form = $this->createForm(DatabaseSetupType::class, $database);
+                    $output = new BufferedOutput();
+                    $application->run($input, $output);
+            
+                    // return the output, don't use if you used NullOutput()
+                    $content = $output->fetch();
+            
+                    //send the message sent by Doctrine to the user's view
+                    $this->connectionSuccessMessage = $content;
         
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $database = $form->getData();
-            // return $this->redirectToRoute('MyddlewareInstallBundle:Default:database_setup.html.twig');
+            //         $message = $this->connectionSuccessMessage;
+            //     } catch (DBALException $e) {
+            //         $message = sprintf('DBALException [%i]: %s', $e->getCode(), $e->getMessage());
+            //     } catch (PDOException $e) {
+            //         $message = sprintf('PDOException [%i]: %s', $e->getCode(), $e->getMessage());
+            //     } catch (ORMException $e) {
+            //         $message = sprintf('ORMException [%i]: %s', $e->getCode(), $e->getMessage());
+            //     } catch (Exception $e) {
+            //         $message = sprintf('Exception [%i]: %s', $e->getCode(), $e->getMessage());
+            //     }
+        
+            // echo $message;
+
+
+
+                
+                // return new Response(""), if you used NullOutput()
+                // return new Response($content);
+
+
+                // php bin/console doctrine:schema:update -f -e prod
+                // Use the NullOutput class instead of BufferedOutput.
+                // $output = new NullOutput();
+        
+                // $application->run($input, $output);
+
+
+
+            }
+    
+        } catch(\Exception $e){
+            error_log($e->getMessage());
         }
-
-
 
 
         return $this->render('MyddlewareInstallBundle:Default:database_setup.html.twig', 
                                 array(
-                                'form' => $form->createView() 
+                                'form' => $form->createView(),
+                                'connection_success_message' =>  $this->connectionSuccessMessage 
                                  )
                                 );
     }

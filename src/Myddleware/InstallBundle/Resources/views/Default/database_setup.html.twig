@@ -21,6 +21,7 @@
             {{ form_start(form) }}
             {{ form_widget(form) }}
             {{ form_end(form) }}
+            {{ connection_success_message }}
             </div> 
            <button class="btn btn-success btn-lg" onClick="window.location.reload()">{{ 'install.next' | trans }}</button>
         </article>

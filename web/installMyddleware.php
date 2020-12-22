@@ -228,7 +228,6 @@ else {
 
 	// Get current Myddleware parameters
 	$myddlewareParameters = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($kernel->getRootDir() .'/config/parameters.yml'));
-	var_dump($myddlewareParameters);
 	$myddlewareParametersPublic = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($kernel->getRootDir() .'/config/public/parameters_public.yml'));
 	var_dump($myddlewareParametersPublic);
 	
@@ -240,21 +239,16 @@ else {
 		$myddlewareParameters['parameters']['secret']= md5(rand(0,10000).date('YmdHis').'myddlewa');		
 		$new_yaml = \Symfony\Component\Yaml\Yaml::dump($myddlewareParameters, 4);
 		file_put_contents($kernel->getRootDir() .'/config/parameters.yml', $new_yaml);
-		var_dump($new_yaml);
 	}	
 
-	if ($myddlewareParameters['parameters']['secret'] == 'Theseviolentdelightshaveviolentends') {
-		$myddlewareParameters['parameters']['secret']= md5(rand(0,10000).date('YmdHis').'myddleware');
-		$new_yaml = \Symfony\Component\Yaml\Yaml::dump($myddlewareParameters, 4);
-		var_dump($myddlewareParameters['parameters']['secret']);
-		var_dump($new_yaml);
-	}
 	
 	// Before we open the form for the installation we check the access to the database 
 	if (
 			empty($_POST['install_status'])
 		&& !empty($myddlewareParameters['parameters']['database_name'])
 	) {
+
+		 var_dump($_POST);
 		// Try to connect to the database with the new parameters
 		try {
 			$pdo = new \PDO('mysql:host='.$myddlewareParameters['parameters']['database_host'].';port='.$myddlewareParameters['parameters']['database_port'].';dbname='.$myddlewareParameters['parameters']['database_name'], $myddlewareParameters['parameters']['database_user'], $myddlewareParameters['parameters']['database_password'],array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
