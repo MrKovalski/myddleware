@@ -6,21 +6,12 @@ use AppKernel;
 use Exception;
 use Requirement;
 use SymfonyRequirements;
-// use Doctrine\ORM\ORMException;
-// use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DBALException;
-// use Doctrine\DBAL\Driver\PDOException;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Process\Process;
 use Myddleware\LoginBundle\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Console\Input\ArrayInput;
-
-use Symfony\Component\Console\Output\NullOutput;
 use Myddleware\InstallBundle\Form\CreateUserType;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Myddleware\InstallBundle\Form\DatabaseSetupType;
@@ -31,8 +22,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 
@@ -228,7 +217,6 @@ class DefaultController extends Controller
                 $fixturesInput = new ArrayInput(array(
                     'command' => 'doctrine:fixtures:load',
                     '--append' => true,
-                    // '-f',
                     '--env' => $env
                 ));
 
@@ -256,31 +244,46 @@ class DefaultController extends Controller
                                 );
     }
 
-
-      /**
+    /**
      * @Route("/user/setup")
      */
     public function setupUserAction(Request $request){
-        try {
-            
+        try {   
             $user = new User();
+            $em = $this->getDoctrine()->getManager();
             $form = $this->createForm(CreateUserType::class, $user);
             $form->handleRequest($request);
             
-            //send form data input to parameters.yml
-            if ($form->isSubmitted() && $form->isValid()) {
-                $application = new Application($kernel);
-                $application->setAutoExit(false);
-    
+            //persist form data to database
+            if ($form->isSubmitted() && $form->isValid()) {        
+                $user->addRole('ROLE_ADMIN');
+                // allows user to login to Myddleware
+                $user->setEnabled(true);
+                $em->persist($user);
+                $em->flush();
+
+                // Retrieve flashbag from the controller
+                $flashbag = $this->get('session')->getFlashBag();
+                // Give confirmation to the user that the form has been sent
+                $flashbag->add("success", "Congratulations ! Your Myddleware account has been created !");
+                
+                // pourquoi je ne peux pas mettre de conditions sur les flashbags?
+                // pourquoi la redirection ne fonctionne pas ???
+                return $this->redirectToRoute('/');
             }
 
         }catch(Exception $e){
             $message = $e->getMessage();
+             // Retrieve flashbag from the controller
+             $flashbag = $this->get('session')->getFlashBag();
+              // Give confirmation to the user that the form has been sent
+              $flashbag->add("error", "Error : there was a problem when creating your Myddleware User in your database. Please try again.");
         }
 
         return $this->render('MyddlewareInstallBundle:Default:user_setup.html.twig',
                                                         array(
-                                                            'form' => $form->createView()
+                                                            'form' => $form->createView(),
+                                                            // 'error' => $message
                                                         )
                             );
     }

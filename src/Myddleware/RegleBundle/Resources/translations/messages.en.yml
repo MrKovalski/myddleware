@@ -750,6 +750,7 @@ install:
     database_setup: Setting up your database
     requirements_checker: Myddleware Requirements Checker
     user_setup: Create your Myddleware user login details
+    role_admin: Please note that these credentials will have administrator access rights to Myddleware
     check_button: Check now 
     next: Next
     requirements_info: First, we will check whether your server meets the requirements to run a Myddleware project.

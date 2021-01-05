@@ -19,10 +19,12 @@ class CreateUserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
 
+        // it's important to keep the name 'plainPassword' as this allows FOSUSerBundle 
+        // to detect that it needs to add a salt + new encrypted password field in database
         $builder
             ->add('username')
             ->add('email', EmailType::class)
-            ->add('password', RepeatedType::class, [
+            ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'The password fields must match.',
                 'options' => ['attr' => ['class' => 'password-field']],
@@ -30,15 +32,11 @@ class CreateUserType extends AbstractType
                 'first_options'  => ['label' => 'Password'],
                 'second_options' => ['label' => 'Repeat Password'],
             ])
-            ->add('Test', SubmitType::class, [
+            ->add('Create', SubmitType::class, [
                 'attr' => [
                     'class' => 'btn btn-success pull-right'
                 ]
             ])
-            ->addEventListener(
-                FormEvents::SUBMIT,
-                [$this, 'onSubmit']
-            )
         ;
     }
 
@@ -49,10 +47,5 @@ class CreateUserType extends AbstractType
         ]);
     }
 
-    public function onSubmit(FormEvent $event)
-    {
   
-
-
-    }
 }
