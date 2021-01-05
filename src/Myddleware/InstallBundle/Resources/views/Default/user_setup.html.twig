@@ -14,26 +14,17 @@
         </div>
         <article class="panel panel-success">
             <div class="panel-heading">
-                <h1 class="panel-title">{{ 'install.database_setup' | trans }}</h1>
-                   
+                <h1 class="panel-title">{{ 'install.user_setup' | trans }}</h1> 
             </div>
             <div class="panel-body">
-            {{ form_start(form) }}
-            {{ form_widget(form) }}
-            {{ form_end(form) }}
-            {% if connection_failed_message %}
-                <p class="bg-danger">{{ connection_failed_message }}</p>
-            {% else %}
-               <p class="bg-success">{{ connection_success_message }}</p>
-            {% endif %}
-            <p class="bg-info">{{ fixtures_error_message }}</p>
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                {{ form_end(form) }}
             </div> 
            <button class="btn btn-success btn-lg" onClick="window.location.reload()">{{ 'install.next' | trans }}</button>
-        </article>
-           
     </section>
 </div>
-    <footer>
+   <footer>
         <p>© Myddleware 2014 - {{ 'now' | date('Y') }}</p>
         <p>version {{ myd_version }}</p>
     </footer>

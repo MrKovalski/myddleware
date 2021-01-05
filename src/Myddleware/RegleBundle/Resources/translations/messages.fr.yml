@@ -749,6 +749,7 @@ management_smtp_sendmail:
 install:
     title: Installation de Myddleware
     database_setup : Configuration de la base de données
+    user_setup: Création de vos identifiants utilisateur Myddleware
     requirements_checker: Vérification des paramètres nécessaires pour installer Myddleware
     requirements_info: Nous allons vérifier que votre installation est bien configurée pour Myddleware
     check_button: Vérifier

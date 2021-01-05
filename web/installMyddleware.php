@@ -248,7 +248,7 @@ else {
 		&& !empty($myddlewareParameters['parameters']['database_name'])
 	) {
 
-		 var_dump($_POST);
+
 		// Try to connect to the database with the new parameters
 		try {
 			$pdo = new \PDO('mysql:host='.$myddlewareParameters['parameters']['database_host'].';port='.$myddlewareParameters['parameters']['database_port'].';dbname='.$myddlewareParameters['parameters']['database_name'], $myddlewareParameters['parameters']['database_user'], $myddlewareParameters['parameters']['database_password'],array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
@@ -313,6 +313,7 @@ else {
 				
 				$process = new \Symfony\Component\Process\Process($myddlewareParametersPublic['parameters']['php']['executable'].' '. $binDir .'/console cache:clear --env='. $kernel->getEnvironment());
 				$process->run();
+				var_dump($process->isSuccessful());
 				// executes after the command finishes
 				if (!$process->isSuccessful()) {
 					throw new Symfony\Component\Process\Exception\ProcessFailedException($process);

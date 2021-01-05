@@ -705,7 +705,7 @@ email_alert:
     recommandation: Please, check if this job is still transferring data. If it doesn't, please stop the job manually by opening the job and clicking on the button "Stop task".
 jobscheduler:
     title: Job scheduler
-    command: Comamand
+    command: Command
     date_created: Date created
     active: Active
     list: List
@@ -713,32 +713,32 @@ jobscheduler:
     period: Period
     job_order: Order job
     date_modified: Date update
-    total : Total
-    create_by : create by
-    modified_by : modified by
-    paramName1 : Parameter 1
-    paramValue1 : Parameter value 1
-    paramName2 : Parameter 2
-    paramValue2 : Parameter value 2
+    total: Total
+    create_by: create by
+    modified_by: modified by
+    paramName1: Parameter 1
+    paramValue1: Parameter value 1
+    paramName2: Parameter 2
+    paramValue2: Parameter value 2
     actions: Action
     new: Create
     update: Update
     cancel: Cancel
     action:
-        new_jobscheduler : New command
+        new_jobscheduler: New command
     view:
-        show : View details
+        show: View details
     description:
-        top : Schedule your Myddleware tasks by creating or modifiyng this table. <a href="http://community.myddleware.com/index.php/administration-guide/#taches-planifiees" target=_blank>More information here.</a> 
-        bottom : > 
+        top: Schedule your Myddleware tasks by creating or modifiyng this table. <a href="http://community.myddleware.com/index.php/administration-guide/#taches-planifiees" target=_blank>More information here.</a> 
+        bottom: > 
                  Add this task in your Linux or Windows task scheduler : php bin/console myddleware:jobScheduler --env=background <BR>
                  For example with Linux, add this command in your contab if you want to run Myddleware scheduler every 5 minutes : <BR>
                    */5 * * * * cd <myddleware_directory>; php bin/console myddleware:jobScheduler --env=background > /dev/null 2>&1
 management_smtp:
-    submit :  Save configuration SMTP
+    submit:  Save configuration SMTP
     cancel: Cancel
-    title : Management SMTP
-    description : 'You can configure email parameters here. More info here : <a href="https://symfony.com/doc/2.8/reference/configuration/swiftmailer.html" target=_blank>https://symfony.com/doc/2.8/reference/configuration/swiftmailer.html</a>'
+    title: Management SMTP
+    description: 'You can configure email parameters here. More info here : <a href="https://symfony.com/doc/2.8/reference/configuration/swiftmailer.html" target=_blank>https://symfony.com/doc/2.8/reference/configuration/swiftmailer.html</a>'
     sendtestmail: Send test mail
 
 management_smtp_sendmail:
@@ -747,11 +747,12 @@ management_smtp_sendmail:
 
 install:
     title: Myddleware Installation
-    database_setup : Setting up your database
+    database_setup: Setting up your database
     requirements_checker: Myddleware Requirements Checker
+    user_setup: Create your Myddleware user login details
     check_button: Check now 
     next: Next
-    requirements_info: First, let's check whether your server meets the requirements to run a Myddleware project.
+    requirements_info: First, we will check whether your server meets the requirements to run a Myddleware project.
     php_ini_error: WARNING ! No configuration file (php.ini) used by PHP!
     php_ini_path_sentence:  PHP is using the following php.ini file
     php_version_not_found: WARNING ! Could not find your PHP version

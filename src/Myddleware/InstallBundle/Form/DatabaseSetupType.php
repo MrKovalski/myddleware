@@ -40,7 +40,7 @@ class DatabaseSetupType extends AbstractType
 
     public function onSubmit(FormEvent $event)
     {
-        // dump($event);
+  
 
 
     }

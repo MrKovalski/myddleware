@@ -8,24 +8,30 @@ use Requirement;
 use SymfonyRequirements;
 // use Doctrine\ORM\ORMException;
 // use Doctrine\DBAL\DBALException;
-use Symfony\Component\Yaml\Yaml;
+use Doctrine\DBAL\DBALException;
 // use Doctrine\DBAL\Driver\PDOException;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Process\Process;
+use Myddleware\LoginBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Console\Input\ArrayInput;
+
 use Symfony\Component\Console\Output\NullOutput;
+use Myddleware\InstallBundle\Form\CreateUserType;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Myddleware\InstallBundle\Form\DatabaseSetupType;
 use Symfony\Component\Console\Output\BufferedOutput;
-
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Myddleware\InstallBundle\Entity\DatabaseParameters;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -41,6 +47,8 @@ class DefaultController extends Controller
     private $checkPassed;
     private $systemStatus;
     private $connectionSuccessMessage;
+    private $connectionFailedMessage;
+    private $fixturesErrorMessage;
 
     /**
      * @Route("/")
@@ -111,8 +119,6 @@ class DefaultController extends Controller
     public function setupDatabaseAction(Request $request){
 
         try {
-           
-    
             //this will allow us to get the DatabaseParameters object & turn it into an array to push in config/parameters.yml
             $encoder = new YamlEncoder();
             $normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
@@ -120,7 +126,11 @@ class DefaultController extends Controller
 
             //used to access root dir
             $kernel = new AppKernel('prod', true);
-        
+            $env = $kernel->getEnvironment();
+
+            //get ..\bin\php\php.exe file
+            $phpBinaryFinder = new PhpExecutableFinder();
+            $phpBinaryPath = $phpBinaryFinder->find();
 
             //get all parameters from config/parameters.yml and push them in a new instance of DatabaseParameters()
             $database = new DatabaseParameters();
@@ -158,85 +168,122 @@ class DefaultController extends Controller
                 $yaml = Yaml::dump($databaseNormalized, 4);
                 //push yml content into parameters.yml
                 file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);
-                // return $this->redirectToRoute('MyddlewareInstallBundle:Default:database_setup.html.twig');
-          
 
-                 $this->connectionSuccessMessage = "Click on the Test button to check your database credentials";
+                $this->connectionSuccessMessage = "Click on the Test button to check your database credentials";
               
                 $em = $this->getDoctrine()->getManager();
                 $em->getConnection()->connect();
                 $connected = $em->getConnection()->isConnected();
   
-                // if($connected === false){
-                //     $this->connectionSuccessMessage = 'There was an error while trying to your database, please check your parameters and try again.';
+            // $application = new Application($kernel);
+            // $application->setAutoExit(false);
+            // $input = new ArrayInput(array(
+            //     'command' => 'cache:clear',
+            //     '--env' => $env
+            // ));
+            // $output = new NullOutput();
+            // $application->run($input, $output);
+          
+            // $process = new Process($phpBinaryPath.' bin/console cache:clear --env='.$env);
+            // $process->run();
 
-                // } else {
-                //     $this->connectionSuccessMessage = 'Connection to the database successful';
-                // }
-             
+            // // executes after the command finishes
+            // if (!$process->isSuccessful()) {
+            //     throw new ProcessFailedException($process);
+            // }
 
-                // try {
-
-                    // we execute Doctrine console commands to test the connection to the database
-                    $application = new Application($kernel);
-                    $application->setAutoExit(false);
-        
-                    $input = new ArrayInput(array(
-                        'command' => 'doctrine:schema:update'
-                        // '--filename' => "test",
-                        // '--extension' => "txt"
-                    ));
-
-                    $output = new BufferedOutput();
-                    $application->run($input, $output);
-            
-                    // return the output, don't use if you used NullOutput()
-                    $content = $output->fetch();
-            
-                    //send the message sent by Doctrine to the user's view
-                    $this->connectionSuccessMessage = $content;
-        
-
-            //         $message = $this->connectionSuccessMessage;
-            //     } catch (DBALException $e) {
-            //         $message = sprintf('DBALException [%i]: %s', $e->getCode(), $e->getMessage());
-            //     } catch (PDOException $e) {
-            //         $message = sprintf('PDOException [%i]: %s', $e->getCode(), $e->getMessage());
-            //     } catch (ORMException $e) {
-            //         $message = sprintf('ORMException [%i]: %s', $e->getCode(), $e->getMessage());
-            //     } catch (Exception $e) {
-            //         $message = sprintf('Exception [%i]: %s', $e->getCode(), $e->getMessage());
-            //     }
-        
-            // echo $message;
+            // echo $process->getOutput(); 
 
 
-
-                
-                // return new Response(""), if you used NullOutput()
-                // return new Response($content);
+            $application = new Application($kernel);
+            $application->setAutoExit(false);
 
 
-                // php bin/console doctrine:schema:update -f -e prod
-                // Use the NullOutput class instead of BufferedOutput.
-                // $output = new NullOutput();
-        
-                // $application->run($input, $output);
+            //run cache:clear command => this doesn't work
+            // $cacheClearInput = new ArrayInput(array(
+            //     'command' => 'cache:clear',
+            //     '--no-warmup',
+            //     '--env' => $env,
+               
+            // ));
+            // $cacheClearOutput = new BufferedOutput();
+            // $application->run($cacheClearInput, $cacheClearOutput);
+            // $cacheClearContent = $cacheClearOutput->fetch();
 
 
+                // we execute Doctrine console commands to test the connection to the database
+                $input = new ArrayInput(array(
+                    'command' => 'doctrine:schema:update',
+                    '--force' => true,
+                    '--env' => $env
+                ));
+                $output = new BufferedOutput();
+                $application->run($input, $output);
+                // return the output, don't use if you used NullOutput()
+                $content = $output->fetch();
+                //send the message sent by Doctrine to the user's view
+                $this->connectionSuccessMessage = $content;
 
+                //load database tables
+                $fixturesInput = new ArrayInput(array(
+                    'command' => 'doctrine:fixtures:load',
+                    '--append' => true,
+                    // '-f',
+                    '--env' => $env
+                ));
+
+                $fixturesOutput = new BufferedOutput();
+                $application->run($fixturesInput, $fixturesOutput);
+                $fixturesContent = $fixturesOutput->fetch();
+                // dump($fixturesContent);
+                $this->fixturesErrorMessage = $fixturesContent;
             }
-    
-        } catch(\Exception $e){
-            error_log($e->getMessage());
-        }
+
+        // if the user made a mistake on one of the fields, we display the message sent by Doctrine
+        } catch (DBALException $e) {
+            $message = $e->getMessage();
+            $this->connectionFailedMessage = $message;
+         }
 
 
         return $this->render('MyddlewareInstallBundle:Default:database_setup.html.twig', 
                                 array(
                                 'form' => $form->createView(),
-                                'connection_success_message' =>  $this->connectionSuccessMessage 
+                                'connection_success_message' =>  $this->connectionSuccessMessage,
+                                'connection_failed_message' => $this->connectionFailedMessage,
+                                'fixtures_error_message' => $this->fixturesErrorMessage
                                  )
                                 );
     }
+
+
+      /**
+     * @Route("/user/setup")
+     */
+    public function setupUserAction(Request $request){
+        try {
+            
+            $user = new User();
+            $form = $this->createForm(CreateUserType::class, $user);
+            $form->handleRequest($request);
+            
+            //send form data input to parameters.yml
+            if ($form->isSubmitted() && $form->isValid()) {
+                $application = new Application($kernel);
+                $application->setAutoExit(false);
+    
+            }
+
+        }catch(Exception $e){
+            $message = $e->getMessage();
+        }
+
+        return $this->render('MyddlewareInstallBundle:Default:user_setup.html.twig',
+                                                        array(
+                                                            'form' => $form->createView()
+                                                        )
+                            );
+    }
+
+
 }
