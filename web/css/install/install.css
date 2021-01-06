@@ -1,3 +1,7 @@
+body {
+    font-size: 16px;
+}
+
 #logo {
     margin-left: 5vw;
 }
@@ -39,12 +43,13 @@ form div div {
     margin: 10px;
 }
 
-.next {
-    margin-bottom: 2vh;
-}
 
 button[type="submit"] {
     margin: auto;
     margin-top: 20px;
     min-width: 95px;
+}
+
+.bg-success, .bg-danger {
+    color: #fff;
 }

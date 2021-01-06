@@ -229,7 +229,6 @@ else {
 	// Get current Myddleware parameters
 	$myddlewareParameters = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($kernel->getRootDir() .'/config/parameters.yml'));
 	$myddlewareParametersPublic = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($kernel->getRootDir() .'/config/public/parameters_public.yml'));
-	var_dump($myddlewareParametersPublic);
 	
 	$databaseConnection = 0;
 	$userCreated = 0;

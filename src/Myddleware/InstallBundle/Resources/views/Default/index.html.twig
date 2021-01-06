@@ -1,6 +1,7 @@
 {% extends '::baseone.html.twig' %}
 {% block title %} {{ 'install.title' | trans }} {% endblock %}
 {% block css %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="{{ asset('css/install/install.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('bundles/regle/css/layout.css') }}" type="text/css" />
 {% endblock css %}
@@ -17,16 +18,20 @@
                 <h1 class="panel-title">{{ 'install.requirements_checker' | trans }}</h1>
             </div>
             <div class="panel-body">
+            <button class="btn btn-primary" type="button" disabled>
+  <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+  Loading...
+</button>
                 <p id="install-info">{{ 'install.requirements_info' | trans }}</p>
                 {% if ini_path %}
                     <p>{{'install.php_ini_path_sentence' | trans }} :</p>
-                    <p id="ini-path" class="bg-success">{{ ini_path }} </p>
+                    <p id="ini-path" class="alert-success" role="alert">{{ ini_path }} </p>
                 {% else %}
                     <p class="bg-danger">{{'install.php_ini_error' | trans }}</p>
                 {% endif %}
                 {% if php_version %}
                     <p>PHP version : </p>
-                    <p class="bg-success">{{ php_version }}</p>
+                    <p class="alert-success">{{ php_version }}</p>
                 {% else %}
                    <p>{{ 'install.php_version_not_found' | trans }}</p>
                 {% endif %}
@@ -58,8 +63,9 @@
                 </aside>
                 <div class="buttons">
                     <button class="btn btn-success btn-lg" onClick="window.location.reload()">{{ 'install.check_button' | trans }}</button>
-                    {# <button class="btn btn-success btn-lg" onClick="{{ path('myddleware_install_database_setup') }}">{{ 'install.next' | trans }}</button> #}
-                    <button class="btn btn-success btn-lg">{{ 'install.next' | trans }}</button>
+                    <a href="{{ path('myddleware_install_default_setupdatabase') }}">
+                        <button class="btn btn-default btn-lg">{{ 'install.next' | trans }}</button>
+                    </a>
                 </div>
             </div> 
           
@@ -69,6 +75,9 @@
 </div>
     <footer>
         <p>© Myddleware 2014 - {{ 'now' | date('Y') }}</p>
-        <p>version {{ myd_version }}</p>
     </footer>
+    {% block javascripts %}
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>  
+        <script src="{{ asset('js/install.js') }}"></script>
+    {% endblock %}
 {% endblock %}
