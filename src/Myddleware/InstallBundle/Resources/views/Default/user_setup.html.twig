@@ -21,19 +21,15 @@
                 {{ form_start(form) }}
                 {{ form_widget(form) }}
                 {{ form_end(form) }}
-                {# {% if error %} #}  
-                    {% for message in app.flashes('error') %}
-                        <div class="flash-notice">
-                            {{ message }}
-                        </div>
+                {% for type, messages in app.session.flashbag.all() %}
+                    {% for message in messages %}
+                        {% if type == 'error' %}
+                            <div class="flash-notice bg-danger">
+                                {{ message }}
+                            </div>
+                        {% endif %}
                     {% endfor %}
-                {# {% else %} #}
-                    {% for message in app.flashes('success') %}
-                        <div class="flash-notice">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {# {% endif %} #}
+                {% endfor %}
             </div> 
          
     </section>

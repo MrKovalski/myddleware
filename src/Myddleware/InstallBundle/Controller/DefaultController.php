@@ -261,15 +261,7 @@ class DefaultController extends Controller
                 $user->setEnabled(true);
                 $em->persist($user);
                 $em->flush();
-
-                // Retrieve flashbag from the controller
-                $flashbag = $this->get('session')->getFlashBag();
-                // Give confirmation to the user that the form has been sent
-                $flashbag->add("success", "Congratulations ! Your Myddleware account has been created !");
-                
-                // pourquoi je ne peux pas mettre de conditions sur les flashbags?
-                // pourquoi la redirection ne fonctionne pas ???
-                return $this->redirectToRoute('/');
+                return $this->redirect($this->generateUrl('LoginBundleUser'));
             }
 
         }catch(Exception $e){
@@ -277,7 +269,7 @@ class DefaultController extends Controller
              // Retrieve flashbag from the controller
              $flashbag = $this->get('session')->getFlashBag();
               // Give confirmation to the user that the form has been sent
-              $flashbag->add("error", "Error : there was a problem when creating your Myddleware User in your database. Please try again.");
+              $flashbag->add("error", $message);
         }
 
         return $this->render('MyddlewareInstallBundle:Default:user_setup.html.twig',
