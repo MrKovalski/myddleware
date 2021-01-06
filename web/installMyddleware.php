@@ -313,7 +313,7 @@ else {
 				
 				$process = new \Symfony\Component\Process\Process($myddlewareParametersPublic['parameters']['php']['executable'].' '. $binDir .'/console cache:clear --env='. $kernel->getEnvironment());
 				$process->run();
-				var_dump($process->isSuccessful());
+				
 				// executes after the command finishes
 				if (!$process->isSuccessful()) {
 					throw new Symfony\Component\Process\Exception\ProcessFailedException($process);

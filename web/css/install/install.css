@@ -1,0 +1,50 @@
+#logo {
+    margin-left: 5vw;
+}
+
+h1 {
+    font-weight: bold;
+}
+
+li {
+    list-style: none;
+}
+
+section {
+    height: fit-content;
+    padding-bottom: 5vh;
+}
+
+.panel {
+    max-width: 65vw;
+    margin: auto;
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+    padding-bottom: 2vh;
+    text-align: center;
+}
+
+code {
+    background-color: #363535;
+    color: #fff;
+}
+
+form {
+    margin: 50px;
+}
+
+form div div {
+    justify-content: space-between;
+    display: flex;
+    margin: 10px;
+}
+
+.next {
+    margin-bottom: 2vh;
+}
+
+button[type="submit"] {
+    margin: auto;
+    margin-top: 20px;
+    min-width: 95px;
+}

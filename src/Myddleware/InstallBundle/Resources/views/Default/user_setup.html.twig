@@ -1,7 +1,7 @@
 {% extends '::baseone.html.twig' %}
 {% block title %} {{ 'install.title' | trans }} {% endblock %}
 {% block css %}
-    <link rel="stylesheet" href="{{ asset('bundles/install/css/install.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ asset('css/install/install.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('bundles/regle/css/layout.css') }}" type="text/css" />
 {% endblock css %}
 {% block body %}
@@ -21,7 +21,7 @@
                 {{ form_start(form) }}
                 {{ form_widget(form) }}
                 {{ form_end(form) }}
-                {# {% if error %} #}
+                {# {% if error %} #}  
                     {% for message in app.flashes('error') %}
                         <div class="flash-notice">
                             {{ message }}
