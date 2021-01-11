@@ -146,12 +146,7 @@ class DefaultController extends Controller
                 file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);
             }
 
-            $form = $this->createForm(DatabaseSetupType::class, $database,
-            //  array(
-            //     'attr' => array(
-            //         'onsubmit' => 'return false'
-            //     ))
-            );
+            $form = $this->createForm(DatabaseSetupType::class, $database);
             $form->handleRequest($request);
             
             //send form data input to parameters.yml
