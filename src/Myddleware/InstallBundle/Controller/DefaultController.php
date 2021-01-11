@@ -146,7 +146,12 @@ class DefaultController extends Controller
                 file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);
             }
 
-            $form = $this->createForm(DatabaseSetupType::class, $database);
+            $form = $this->createForm(DatabaseSetupType::class, $database,
+            //  array(
+            //     'attr' => array(
+            //         'onsubmit' => 'return false'
+            //     ))
+            );
             $form->handleRequest($request);
             
             //send form data input to parameters.yml
@@ -164,41 +169,8 @@ class DefaultController extends Controller
                 $em->getConnection()->connect();
                 $connected = $em->getConnection()->isConnected();
   
-            // $application = new Application($kernel);
-            // $application->setAutoExit(false);
-            // $input = new ArrayInput(array(
-            //     'command' => 'cache:clear',
-            //     '--env' => $env
-            // ));
-            // $output = new NullOutput();
-            // $application->run($input, $output);
-          
-            // $process = new Process($phpBinaryPath.' bin/console cache:clear --env='.$env);
-            // $process->run();
-
-            // // executes after the command finishes
-            // if (!$process->isSuccessful()) {
-            //     throw new ProcessFailedException($process);
-            // }
-
-            // echo $process->getOutput(); 
-
-
-            $application = new Application($kernel);
-            $application->setAutoExit(false);
-
-
-            //run cache:clear command => this doesn't work
-            // $cacheClearInput = new ArrayInput(array(
-            //     'command' => 'cache:clear',
-            //     '--no-warmup',
-            //     '--env' => $env,
-               
-            // ));
-            // $cacheClearOutput = new BufferedOutput();
-            // $application->run($cacheClearInput, $cacheClearOutput);
-            // $cacheClearContent = $cacheClearOutput->fetch();
-
+                $application = new Application($kernel);
+                $application->setAutoExit(false);
 
                 // we execute Doctrine console commands to test the connection to the database
                 $input = new ArrayInput(array(
@@ -223,15 +195,15 @@ class DefaultController extends Controller
                 $fixturesOutput = new BufferedOutput();
                 $application->run($fixturesInput, $fixturesOutput);
                 $fixturesContent = $fixturesOutput->fetch();
-                // dump($fixturesContent);
-                $this->fixturesErrorMessage = $fixturesContent;
+                // $this->fixturesErrorMessage = $fixturesContent;
             }
 
         // if the user made a mistake on one of the fields, we display the message sent by Doctrine
         } catch (DBALException $e) {
             $message = $e->getMessage();
             $this->connectionFailedMessage = $message;
-         }
+        }
+     
 
 
         return $this->render('MyddlewareInstallBundle:Default:database_setup.html.twig', 
@@ -239,7 +211,7 @@ class DefaultController extends Controller
                                 'form' => $form->createView(),
                                 'connection_success_message' =>  $this->connectionSuccessMessage,
                                 'connection_failed_message' => $this->connectionFailedMessage,
-                                'fixtures_error_message' => $this->fixturesErrorMessage
+                                // 'fixtures_error_message' => $this->fixturesErrorMessage
                                  )
                                 );
     }
@@ -275,7 +247,6 @@ class DefaultController extends Controller
         return $this->render('MyddlewareInstallBundle:Default:user_setup.html.twig',
                                                         array(
                                                             'form' => $form->createView(),
-                                                            // 'error' => $message
                                                         )
                             );
     }

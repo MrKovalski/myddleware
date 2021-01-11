@@ -26,17 +26,21 @@
             {% else %}
                <p class="alert-success">{{ connection_success_message }}</p>
             {% endif %}
-            <p class="alert-info">{{ fixtures_error_message }}</p>
+            {# <p class="alert-info">{{ fixtures_error_message }}</p> #}
             </div> 
              <div class="buttons">
-                <a href="{{ path('myddleware_install_default_index') }}">
-                    <button class="btn btn-default btn-lg">
-                        {{ 'install.previous' | trans }}
+                    <button class="btn btn-default btn-lg" id="previous-btn">
+                        <a href="{{ path('myddleware_install_default_index') }}" id="previous">
+                             {{ 'install.previous' | trans }}
+                        </a>
                     </button>
-                </a>
-                <a href="{{ path('myddleware_install_default_setupuser') }}">
-                    <button class="btn btn-default btn-lg">{{ 'install.next' | trans }}</button>
-                </a>
+                    {% if connection_success_message %}
+                    <button class="btn btn-default btn-lg" id="next-btn">
+                        <a href="{{ path('myddleware_install_default_setupuser') }}" id="next">
+                            {{ 'install.next' | trans }}
+                        </a>
+                    </button>
+                    {% endif %}
             </div>
         </article>
            
@@ -47,7 +51,9 @@
         <p>version {{ myd_version }}</p>
     </footer>
     {% block javascripts %}
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>  
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
         <script src="{{ asset('js/install.js') }}"></script>
     {% endblock %}
 {% endblock %}

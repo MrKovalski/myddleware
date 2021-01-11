@@ -53,3 +53,9 @@ button[type="submit"] {
 .bg-success, .bg-danger {
     color: #fff;
 }
+
+/* navigation buttons */
+#previous, #next {
+    text-decoration: none;
+    color: #000;
+}
