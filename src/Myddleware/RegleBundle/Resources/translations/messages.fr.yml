@@ -749,13 +749,17 @@ management_smtp_sendmail:
 install:
     title: Installation de Myddleware
     database_setup : Configuration de la base de données
+    test_button: Se connecter à la base de données
     user_setup: Création de vos identifiants utilisateur Myddleware
     role_admin: Ces identifiants Myddleware auront les droits administrateur
+    system_status_ready: Votre système est prêt à utiliser Myddleware
+    system_status_not_ready: Votre système n'est pas encore prêt à faire tourner Myddleware
     requirements_checker: Vérification des paramètres nécessaires pour installer Myddleware
     requirements_info: Nous allons vérifier que votre installation est bien configurée pour Myddleware
     check_button: Vérifier
     next: Suivant
     previous: Précédent
+    next_step: Vous pouvez maintenant passer à l'étape suivante et configurer votre utilisateur Myddleware
     php_ini_error: ATTENTION ! Le fichier de configuration PHP (php.ini) n'a pas été trouvé!
     php_ini_path_sentence:  PHP utilise le fichier php.ini suivant 
     php_version_not_found: ATTENTION ! Impossible de trouver votre version de PHP

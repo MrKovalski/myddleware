@@ -85,9 +85,9 @@ class DefaultController extends Controller
         }
         $this->systemStatus = '';
         if($this->checkPassed){
-            $this->systemStatus = 'Your system is ready to run Myddleware.';
+            $this->systemStatus = $this->get('translator')->trans('install.system_status_ready');
         }else{
-            $this->systemStatus ='Your system is not ready to run Myddleware yet.';
+            $this->systemStatus = $this->get('translator')->trans('install.system_status_not_ready');
         }
 
         return $this->render('MyddlewareInstallBundle:Default:index.html.twig',
@@ -156,10 +156,7 @@ class DefaultController extends Controller
                 //convert the normalized object into a yml file
                 $yaml = Yaml::dump($databaseNormalized, 4);
                 //push yml content into parameters.yml
-                file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);
-
-                $this->connectionSuccessMessage = "Click on the Test button to check your database credentials";
-              
+                file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);   
                 $em = $this->getDoctrine()->getManager();
                 $em->getConnection()->connect();
                 $connected = $em->getConnection()->isConnected();
@@ -180,6 +177,26 @@ class DefaultController extends Controller
                 //send the message sent by Doctrine to the user's view
                 $this->connectionSuccessMessage = $content;
 
+                //slight bug : sometimes the ERROR message is sent as a success, so if it's too long we reset it as an error
+                if(strlen($this->connectionSuccessMessage) > 150) {
+                    $this->connectionFailedMessage = $this->connectionSuccessMessage;
+                    // trim the message to remove unnecessary stack trace
+                    $this->connectionFailedMessage = strstr($this->connectionFailedMessage, 'Exception trace', true);
+                    $this->connectionSuccessMessage = '';
+                }
+
+
+                // if everything went well, we rewrite parameters.yml with block_install: 1
+                if($this->connectionSuccessMessage){
+                    $database->setBlockInstall(1);
+                    $databaseNormalized['parameters'] = $serializer->normalize($database, null);
+                    //convert the normalized object into a yml file
+                    $yaml = Yaml::dump($databaseNormalized, 4);
+                    //push yml content into parameters.yml
+                    file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);
+                    
+                }
+
                 //load database tables
                 $fixturesInput = new ArrayInput(array(
                     'command' => 'doctrine:fixtures:load',
@@ -190,7 +207,6 @@ class DefaultController extends Controller
                 $fixturesOutput = new BufferedOutput();
                 $application->run($fixturesInput, $fixturesOutput);
                 $fixturesContent = $fixturesOutput->fetch();
-                // $this->fixturesErrorMessage = $fixturesContent;
             }
 
         // if the user made a mistake on one of the fields, we display the message sent by Doctrine
@@ -206,7 +222,6 @@ class DefaultController extends Controller
                                 'form' => $form->createView(),
                                 'connection_success_message' =>  $this->connectionSuccessMessage,
                                 'connection_failed_message' => $this->connectionFailedMessage,
-                                // 'fixtures_error_message' => $this->fixturesErrorMessage
                                  )
                                 );
     }
