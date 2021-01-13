@@ -23,11 +23,18 @@ class DatabaseSetupType extends AbstractType
             ->add('database_name')
             ->add('database_user')
             ->add('database_password')
-            ->add('Connect', SubmitType::class,[
+            ->add('Create', SubmitType::class,[
                 'attr' => [
                     'class' => 'btn btn-success btn-lg pull-right',
                 ]
             ])
+            // ->add('Connect', SubmitType::class,[
+            //     'attr' => [
+            //         'class' => 'btn btn-success btn-lg pull-right',
+            //         'label' => 'Save & Connect',
+            //         'disabled' => true
+            //     ]
+            // ])
             ->addEventListener(
                 FormEvents::SUBMIT,
                 [$this, 'onSubmit']

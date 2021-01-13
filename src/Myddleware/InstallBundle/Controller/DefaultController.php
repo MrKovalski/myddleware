@@ -12,6 +12,7 @@ use Myddleware\LoginBundle\Entity\User;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Console\Input\ArrayInput;
+use Doctrine\Common\Collections\ArrayCollection;
 use Myddleware\InstallBundle\Form\CreateUserType;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Myddleware\InstallBundle\Form\DatabaseSetupType;
@@ -151,62 +152,72 @@ class DefaultController extends Controller
             
             //send form data input to parameters.yml
             if ($form->isSubmitted() && $form->isValid()) {
-                $database = $form->getData();
-                $databaseNormalized['parameters'] = $serializer->normalize($database, null);
-                //convert the normalized object into a yml file
-                $yaml = Yaml::dump($databaseNormalized, 4);
-                //push yml content into parameters.yml
-                file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);   
-                $em = $this->getDoctrine()->getManager();
-                $em->getConnection()->connect();
-                $connected = $em->getConnection()->isConnected();
-  
-                $application = new Application($kernel);
-                $application->setAutoExit(false);
-
-                // we execute Doctrine console commands to test the connection to the database
-                $input = new ArrayInput(array(
-                    'command' => 'doctrine:schema:update',
-                    '--force' => true,
-                    '--env' => $env
-                ));
-                $output = new BufferedOutput();
-                $application->run($input, $output);
-                // return the output, don't use if you used NullOutput()
-                $content = $output->fetch();
-                //send the message sent by Doctrine to the user's view
-                $this->connectionSuccessMessage = $content;
-
-                //slight bug : sometimes the ERROR message is sent as a success, so if it's too long we reset it as an error
-                if(strlen($this->connectionSuccessMessage) > 150) {
-                    $this->connectionFailedMessage = $this->connectionSuccessMessage;
-                    // trim the message to remove unnecessary stack trace
-                    $this->connectionFailedMessage = strstr($this->connectionFailedMessage, 'Exception trace', true);
-                    $this->connectionSuccessMessage = '';
-                }
-
-
-                // if everything went well, we rewrite parameters.yml with block_install: 1
-                if($this->connectionSuccessMessage){
-                    $database->setBlockInstall(1);
+            //   we need to separate the logic into 2 actions from the user to ensure that
+            // Doctrine doesn't read parameters.yml from cache / previous parameters
+            // therefore we first click on create to update parameters.yml 
+            // THEN we click on connect to execute console commands (db update + fixtures)
+                // if( $form->get('Create')->isClicked() ){
+                    $database = $form->getData();
                     $databaseNormalized['parameters'] = $serializer->normalize($database, null);
                     //convert the normalized object into a yml file
                     $yaml = Yaml::dump($databaseNormalized, 4);
                     //push yml content into parameters.yml
-                    file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);
-                    
-                }
+                    file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);   
+                    $em = $this->getDoctrine()->getManager();
+                    $em->getConnection()->connect();
+                    $connected = $em->getConnection()->isConnected();
+        
+                // } 
 
-                //load database tables
-                $fixturesInput = new ArrayInput(array(
-                    'command' => 'doctrine:fixtures:load',
-                    '--append' => true,
-                    '--env' => $env
-                ));
+                // if( $form->get('Connect')->isClicked() ){
 
-                $fixturesOutput = new BufferedOutput();
-                $application->run($fixturesInput, $fixturesOutput);
-                $fixturesContent = $fixturesOutput->fetch();
+                    $application = new Application($kernel);
+                    $application->setAutoExit(false);
+    
+                    // we execute Doctrine console commands to test the connection to the database
+                    $input = new ArrayInput(array(
+                        'command' => 'doctrine:schema:update',
+                        '--force' => true,
+                        '--env' => $env
+                    ));
+                    $output = new BufferedOutput();
+                    $application->run($input, $output);
+                    $content = $output->fetch();
+                    //send the message sent by Doctrine to the user's view
+                    $this->connectionSuccessMessage = $content;
+    
+                    //slight bug : sometimes the ERROR message is sent as a success, so if it's too long we reset it as an error
+                    if(strlen($this->connectionSuccessMessage) > 150) {
+                        $this->connectionFailedMessage = $this->connectionSuccessMessage;
+                        // trim the message to remove unnecessary stack trace
+                        $this->connectionFailedMessage = strstr($this->connectionFailedMessage, 'Exception trace', true);
+                        $this->connectionSuccessMessage = '';
+                    }
+    
+    
+                    // if everything went well, we rewrite parameters.yml with block_install: 1
+                    if($this->connectionSuccessMessage){
+                        $database->setBlockInstall(1);
+                        $databaseNormalized['parameters'] = $serializer->normalize($database, null);
+                        //convert the normalized object into a yml file
+                        $yaml = Yaml::dump($databaseNormalized, 4);
+                        //push yml content into parameters.yml
+                        file_put_contents($kernel->getProjectDir() .'/app/config/parameters.yml', $yaml);
+                        
+                    }
+    
+                    //load database tables
+                    $fixturesInput = new ArrayInput(array(
+                        'command' => 'doctrine:fixtures:load',
+                        '--append' => true,
+                        '--env' => $env
+                    ));
+    
+                    $fixturesOutput = new BufferedOutput();
+                    $application->run($fixturesInput, $fixturesOutput);
+                    $fixturesContent = $fixturesOutput->fetch();
+                // } 
+              
             }
 
         // if the user made a mistake on one of the fields, we display the message sent by Doctrine

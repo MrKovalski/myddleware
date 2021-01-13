@@ -16,3 +16,11 @@ var loading = $( '<p><span>Waiting for server response</span></p><div class="spi
     $(loading).appendTo('form');
   });
  
+
+//On Database Creation : enable disabled button only once the first 'Create' button has been submitted
+// $('form').on('submit', function(e) {
+//   $(':disabled').each(function(e) {
+//       $(this).removeAttr('disabled');
+//       console.log('âtate');
+//   })
+// });
